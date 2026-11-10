@@ -12,7 +12,7 @@ object Cfg {
     // Isi Profile
     const val PROFILE_NAME = "Glacier"
     const val PROFILE_TAGLINE = "Profil Apps"
-    const val PROFILE_BIO = "Selamat datang di Glacier Profil Apps. Aplikasi profil dengan nuansa es yang dingin, halus, dan elegan."
+    const val PROFILE_BIO = "Glacier Profil Apps: freeze aplikasi, cleaner RAM, Game Space, dan tuning performa dengan nuansa es yang dingin, halus, dan elegan."
     val PROFILE_INFO = listOf(
         "Nama" to "Glacier",
         "Aplikasi" to "Profil Apps",

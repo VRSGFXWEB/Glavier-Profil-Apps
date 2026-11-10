@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -94,14 +96,16 @@ fun SplashScreen(onDone: () -> Unit) {
 private data class Tab(val label: String, val icon: ImageVector)
 
 private val tabs = listOf(
+    Tab("Home", Icons.Filled.Home),
+    Tab("Packages", Icons.AutoMirrored.Filled.List),
+    Tab("Cleaner", Icons.Filled.Delete),
+    Tab("Saran", Icons.Filled.Lock),
     Tab("Profile", Icons.Filled.Person),
-    Tab("Admin", Icons.Filled.Notifications),
-    Tab("Support", Icons.Filled.Favorite),
-    Tab("Contact", Icons.Filled.Phone),
 )
 
 @Composable
 fun MainScreen() {
+    val vm: MainVM = viewModel()
     var tab by rememberSaveable { mutableIntStateOf(0) }
     Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Bg, Color(0xFF0A1A44), Bg)))) {
         Snow(Modifier.fillMaxSize())
@@ -109,12 +113,12 @@ fun MainScreen() {
             containerColor = Color.Transparent,
             topBar = {
                 Row(
-                    Modifier.statusBarsPadding().padding(horizontal = 20.dp, vertical = 12.dp),
+                    Modifier.statusBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(painterResource(R.drawable.logo), null, Modifier.size(34.dp).clip(RoundedCornerShape(10.dp)))
+                    Image(painterResource(R.drawable.logo), null, Modifier.size(30.dp).clip(RoundedCornerShape(9.dp)))
                     Spacer(Modifier.width(10.dp))
-                    Text(Cfg.APP_NAME, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(Cfg.APP_NAME, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             },
             bottomBar = {
@@ -127,7 +131,7 @@ fun MainScreen() {
                         NavigationBarItem(
                             selected = sel, onClick = { tab = i },
                             icon = { Icon(t.icon, t.label, Modifier.graphicsLayer { scaleX = s; scaleY = s }) },
-                            label = { Text(t.label, fontSize = 11.sp) },
+                            label = { Text(t.label, fontSize = 10.sp, maxLines = 1) },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = Color.White, selectedTextColor = Accent,
                                 indicatorColor = Color(0x554FC3FF),
@@ -147,20 +151,14 @@ fun MainScreen() {
                 }
             ) { t ->
                 when (t) {
-                    0 -> ProfileScreen()
-                    1 -> LinkScreen(
-                        Icons.Filled.Notifications, "Saluran Admin",
-                        "Gabung saluran WhatsApp admin untuk info, update, dan pengumuman terbaru.",
-                        "Buka Saluran Admin", Cfg.ADMIN_CHANNEL
-                    )
-                    2 -> LinkScreen(
-                        Icons.Filled.Favorite, "Thanks Support",
-                        "Terima kasih buat semua yang sudah support! Gabung saluran Thanks Support di WhatsApp.",
-                        "Buka Thanks Support", Cfg.SUPPORT_CHANNEL
-                    )
-                    else -> ContactScreen()
+                    0 -> HomeScreen(vm)
+                    1 -> PackagesScreen(vm)
+                    2 -> CleanerScreen(vm)
+                    3 -> SaranScreen(vm)
+                    else -> ProfileScreen()
                 }
             }
         }
+        IslandToast(vm)
     }
 }
