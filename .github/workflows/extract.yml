@@ -1,0 +1,79 @@
+name: Extract Glacier Profil Apps
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Extract ZIP
+        run: |
+          ZIP_FILE=$(find . -maxdepth 1 -iname "*.zip" | head -n 1)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "Tidak ada file .zip ditemukan di root repo!"
+            exit 1
+          fi
+
+          echo "Extracting: $ZIP_FILE"
+          mkdir -p extracted
+          unzip -o "$ZIP_FILE" -d extracted
+          rm -f "$ZIP_FILE"
+
+      - name: Move Project Files
+        run: |
+          shopt -s dotglob nullglob
+          ITEMS=(extracted/*)
+
+          if [ ${#ITEMS[@]} -eq 1 ] && [ -d "${ITEMS[0]}" ]; then
+            cp -a "${ITEMS[0]}"/. .
+          else
+            cp -a extracted/. .
+          fi
+
+          rm -rf extracted
+
+      - name: Commit Extracted Files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A -- . ':!.github/workflows/**'
+
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan."
+          else
+            git commit -m "Extract Glacier Profil Apps project"
+            git push
+          fi
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Build APK
+        run: gradle assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GlacierProfilApps-APK
+          path: app/build/outputs/apk/debug/*.apk
