@@ -1,6 +1,5 @@
 package com.glacier.profilapps
 
-import androidx.compose.ui.graphics.drawscope.drawOutline
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -21,6 +20,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -60,15 +61,16 @@ fun GlacierTheme(content: @Composable () -> Unit) {
 
 /** Efek "tenggelam" (inset shadow) ala CSS. Pasang setelah clip + background. */
 fun Modifier.inset(shape: Shape, depth: Dp, dark: Color = Color(0x400284C7)): Modifier = this.drawBehind {
-    val o = shape.createOutline(size, layoutDirection, this)
-    drawOutline(
-        o,
-        Brush.linearGradient(
-            listOf(dark, dark.copy(alpha = 0f), Color(0x00FFFFFF), Color.White),
-            start = Offset.Zero, end = Offset(size.width, size.height)
-        ),
-        style = Stroke(depth.toPx() * 2)
+    val brush = Brush.linearGradient(
+        listOf(dark, dark.copy(alpha = 0f), Color(0x00FFFFFF), Color.White),
+        start = Offset.Zero, end = Offset(size.width, size.height)
     )
+    val st = Stroke(depth.toPx() * 2)
+    when (val o = shape.createOutline(size, layoutDirection, this)) {
+        is Outline.Rectangle -> drawRect(brush, o.rect.topLeft, o.rect.size, style = st)
+        is Outline.Rounded -> drawPath(Path().apply { addRoundRect(o.roundRect) }, brush, style = st)
+        is Outline.Generic -> drawPath(o.path, brush, style = st)
+    }
 }
 
 /** Efek tekan: scale 0.94 + turun 2dp. Taruh paling awal di chain modifier. */
