@@ -5,19 +5,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -31,85 +31,105 @@ fun HomeScreen(vm: MainVM) {
     var showDaily by remember { mutableStateOf(false) }
     var showGame by remember { mutableStateOf(false) }
     var showHelp by remember { mutableStateOf(false) }
-    val exportL = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { u ->
-        if (u != null) vm.exportTo(u)
-    }
-    val importL = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { u ->
-        if (u != null) vm.importFrom(u)
-    }
+    val exportL = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { u -> if (u != null) vm.exportTo(u) }
+    val importL = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { u -> if (u != null) vm.importFrom(u) }
     val kernel = remember { System.getProperty("os.version") ?: "Linux Kernel" }
     val device = remember { "${Build.BRAND.uppercase()} ${Build.MODEL} • Android ${Build.VERSION.RELEASE}" }
     val modes = mapOf("powersaver" to "Power Saver", "balance" to "Balance", "extreme" to "Extreme")
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
-        ScreenHeader("Glacier Home", "Core Ecosystem", "Refresh") { vm.refreshAll() }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp, 16.dp, 16.dp, 110.dp)) {
+        HeaderCapsule(Ic.Home, "Glacier Home", "Core Ecosystem", "Refresh") { vm.refreshAll() }
+
+        if (vm.rootOk == false) {
+            Row(
+                Modifier.fillMaxWidth().padding(bottom = 14.dp).pressable { vm.recheckRoot() }.clip(RoundedCornerShape(22.dp))
+                    .background(DangerLight).border(1.5.dp, Danger, RoundedCornerShape(22.dp)).padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                I(Ic.Alert, Danger, 20.dp)
+                Column {
+                    Text("Akses root belum aktif", color = Danger, fontSize = 12.5.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Freeze, tuning, dan cleaner butuh root. Beri izin root ke aplikasi ini lalu tap untuk cek ulang.", color = TextMuted, fontSize = 10.5.sp)
+                }
+            }
+        }
 
         Appear(0) {
-            Column {
-                if (vm.rootOk == false) {
-                    GlassCard(onClick = { vm.recheckRoot() }) {
-                        Text("Akses root belum aktif", color = Color(0xFFFDA4AF), fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                        Text(
-                            "Freeze, tuning, dan cleaner butuh root (KernelSU/Magisk). Beri izin root ke Glacier Profil Apps lalu tap di sini untuk cek ulang.",
-                            color = Ice.copy(alpha = .8f), fontSize = 11.sp
-                        )
-                    }
-                    Spacer(Modifier.height(12.dp))
-                }
-                Image(
-                    painterResource(R.drawable.banner), null,
-                    Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(24.dp)),
-                    contentScale = ContentScale.Crop
-                )
+            val shape = RoundedCornerShape(26.dp)
+            Box(
+                Modifier.fillMaxWidth().padding(bottom = 14.dp).aspectRatio(16f / 9f)
+                    .shadow(12.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape)
+                    .border(2.dp, WhiteRim, shape)
+            ) {
+                Image(painterResource(R.drawable.banner), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             }
         }
-        Spacer(Modifier.height(12.dp))
         Appear(1) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                GlassCard(Modifier.weight(1f)) {
-                    Text("KERNEL OS", color = Accent, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
-                    Text(kernel, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+            Row(Modifier.padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GlassBox(Modifier.weight(1f)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+                        I(Ic.Cpu, IcePrimary, 14.dp)
+                        Text("KERNEL OS", color = IcePrimary, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                    }
+                    Text(kernel, color = TextMain, fontSize = 12.5.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 15.sp)
                 }
-                GlassCard(Modifier.weight(1f)) {
-                    Text("PERANGKAT & OS", color = Accent, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
-                    Text(device, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+                GlassBox(Modifier.weight(1f)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+                        I(Ic.Device, IcePrimary, 14.dp)
+                        Text("PERANGKAT & OS", color = IcePrimary, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                    }
+                    Text(device, color = TextMain, fontSize = 12.5.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 15.sp)
                 }
             }
         }
-        Spacer(Modifier.height(12.dp))
         Appear(2) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ModeCard("Mode Daily", "Mode: ${modes[vm.dailyMode] ?: "Balance"}", Icons.Filled.Refresh, Modifier.weight(1f)) { showDaily = true }
-                ModeCard("Game Space", "${vm.games.size} Game Terkonfigurasi", Icons.Filled.PlayArrow, Modifier.weight(1f)) { showGame = true }
+            Row(Modifier.padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ModeCard("Mode Daily", "Mode: ${modes[vm.dailyMode] ?: "Balance"}", Ic.Clock, Modifier.weight(1f)) { showDaily = true }
+                ModeCard("Game Space", "${vm.games.size} Game Terkonfigurasi", Ic.Gamepad, Modifier.weight(1f)) { showGame = true }
             }
         }
-        Spacer(Modifier.height(12.dp))
         Appear(3) {
-            GlassCard(onClick = { vm.resetAll() }) {
-                Text("Reset Pengaturan Sistem", color = Color(0xFFFDA4AF), fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-                Text("Kembalikan animasi, refresh rate, dan tuning ke default Android", color = Ice.copy(alpha = .7f), fontSize = 11.sp)
-            }
-        }
-        Spacer(Modifier.height(12.dp))
-        Appear(4) {
-            GlassCard {
-                Text("Cadangan & Pemulihan (JSON)", color = Accent, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                Spacer(Modifier.height(10.dp))
-                BackupRow("Simpan Konfigurasi Aktif", "Cadangkan setelan ke glacier.json", "Save", BtnKind.Success) { exportL.launch("glacier.json") }
-                Spacer(Modifier.height(10.dp))
-                BackupRow("Pulihkan Konfigurasi", "Terapkan dari berkas glacier.json", "Import", BtnKind.Primary) {
-                    importL.launch(arrayOf("application/json", "*/*"))
+            Box(Modifier.padding(bottom = 12.dp)) {
+                PillButton({ vm.resetAll() }, Danger, Color(0xFFFECACA)) {
+                    Box(
+                        Modifier.size(32.dp).shadow(3.dp, CircleShape, ambientColor = Danger, spotColor = Danger).clip(CircleShape)
+                            .background(Brush.linearGradient(listOf(Color(0xFFF43F5E), Danger))),
+                        contentAlignment = Alignment.Center
+                    ) { I(Ic.Reset, Color.White, 16.dp) }
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Reset Pengaturan Sistem", color = Danger, fontSize = 12.8.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("Kembalikan animasi, refresh rate, & tuning ke default Android", color = TextMuted, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                    I(Ic.Chevron, Danger, 16.dp)
                 }
             }
         }
-        Spacer(Modifier.height(12.dp))
-        Appear(5) {
-            GlassCard(onClick = { showHelp = true }) {
-                Text("Buku Panduan", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-                Text("Cara pakai, fungsi tombol, dan konfigurasi optimal", color = Ice.copy(alpha = .7f), fontSize = 11.sp)
+        Appear(4) {
+            Box(Modifier.padding(bottom = 12.dp)) {
+                PitBox {
+                    TableHead("Cadangan & Pemulihan (JSON)") { Text("glacier.json", color = TextMain, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold) }
+                    BackupRow(Ic.Save, "Simpan Konfigurasi Aktif", "Cadangkan seluruh setelan ke glacier.json", "Save Settings", BtnKind.Success) { exportL.launch("glacier.json") }
+                    BackupRow(Ic.Upload, "Pulihkan Konfigurasi", "Terapkan dari berkas glacier.json", "Import File", BtnKind.Primary) {
+                        importL.launch(arrayOf("application/json", "*/*"))
+                    }
+                }
             }
         }
-        Spacer(Modifier.height(24.dp))
+        Appear(5) {
+            PillButton({ showHelp = true }, IcePrimary, IcePrimary) {
+                Box(
+                    Modifier.size(32.dp).clip(CircleShape).background(Brush.linearGradient(listOf(Color(0xFF0EA5E9), IcePrimary))),
+                    contentAlignment = Alignment.Center
+                ) { I(Ic.Book, Color.White, 16.dp) }
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Buku Panduan Modul", color = TextMain, fontSize = 12.8.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Cara pakai, fungsi tombol, & konfigurasi optimal", color = TextMuted, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                }
+                I(Ic.Chevron, IceDeep, 16.dp)
+            }
+        }
     }
 
     if (showDaily) DailyDialog(vm) { showDaily = false }
@@ -119,23 +139,36 @@ fun HomeScreen(vm: MainVM) {
 
 @Composable
 private fun ModeCard(title: String, status: String, icon: ImageVector, modifier: Modifier, onClick: () -> Unit) {
-    GlassCard(modifier, onClick = onClick) {
-        Box(Modifier.size(34.dp).clip(CircleShape).background(Color(0x334FC3FF)), contentAlignment = Alignment.Center) {
-            Icon(icon, null, tint = Ice, modifier = Modifier.size(18.dp))
+    ActionCard(modifier, onClick) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(34.dp).clip(CircleShape).background(Brush.linearGradient(listOf(IceLight, IceBorder)))
+                    .border(1.dp, IcePrimary, CircleShape),
+                contentAlignment = Alignment.Center
+            ) { I(icon, IceDeep, 16.dp) }
+            Spacer(Modifier.weight(1f))
+            I(Ic.Chevron, IceDeep, 16.dp)
         }
-        Spacer(Modifier.height(8.dp))
-        Text(title, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-        Text(status, color = Accent, fontSize = 11.sp)
+        Column {
+            Text(title, color = TextMain, fontSize = 13.6.sp, fontWeight = FontWeight.ExtraBold)
+            Text(status, color = IceDeep, fontSize = 10.4.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
 @Composable
-private fun BackupRow(title: String, sub: String, btn: String, kind: BtnKind, onClick: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+private fun BackupRow(icon: ImageVector, title: String, sub: String, btn: String, kind: BtnKind, onClick: () -> Unit) {
+    CapsuleRow(height = 56.dp) {
+        Box(
+            Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(IceLight).border(1.5.dp, IceBorder, RoundedCornerShape(10.dp)),
+            contentAlignment = Alignment.Center
+        ) { I(icon, IceDeep, 16.dp) }
+        Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            Text(sub, color = Ice.copy(alpha = .65f), fontSize = 10.sp)
+            Text(title, color = TextMain, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+            Text(sub, color = IceDeep, fontSize = 9.5.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
         }
-        SmallBtn(btn, kind, onClick = onClick)
+        Spacer(Modifier.width(8.dp))
+        Btn(btn, kind, onClick = onClick)
     }
 }
