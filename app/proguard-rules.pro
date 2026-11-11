@@ -1,2 +1,6 @@
 -keep class * extends androidx.lifecycle.ViewModel { <init>(...); }
 -keep class * extends androidx.lifecycle.AndroidViewModel { <init>(android.app.Application); }
+-keep class com.glacier.profilapps.UserService { <init>(...); }
+-keep class com.glacier.profilapps.IUserService** { *; }
+-keep class rikka.shizuku.** { *; }
+-keep class moe.shizuku.** { *; }

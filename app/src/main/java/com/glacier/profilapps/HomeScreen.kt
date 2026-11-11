@@ -40,19 +40,7 @@ fun HomeScreen(vm: MainVM) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp, 16.dp, 16.dp, 110.dp)) {
         HeaderCapsule(Ic.Home, "Glacier Home", "Core Ecosystem", "Refresh") { vm.refreshAll() }
 
-        if (vm.rootOk == false) {
-            Row(
-                Modifier.fillMaxWidth().padding(bottom = 14.dp).pressable { vm.recheckRoot() }.clip(RoundedCornerShape(22.dp))
-                    .background(DangerLight).border(1.5.dp, Danger, RoundedCornerShape(22.dp)).padding(14.dp),
-                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                I(Ic.Alert, Danger, 20.dp)
-                Column {
-                    Text("Akses root belum aktif", color = Danger, fontSize = 12.5.sp, fontWeight = FontWeight.ExtraBold)
-                    Text("Freeze, tuning, dan cleaner butuh root. Beri izin root ke aplikasi ini lalu tap untuk cek ulang.", color = TextMuted, fontSize = 10.5.sp)
-                }
-            }
-        }
+        AccessCard(vm)
 
         Appear(0) {
             val shape = RoundedCornerShape(26.dp)
@@ -170,5 +158,47 @@ private fun BackupRow(icon: ImageVector, title: String, sub: String, btn: String
         }
         Spacer(Modifier.width(8.dp))
         Btn(btn, kind, onClick = onClick)
+    }
+}
+
+@Composable
+private fun AccessCard(vm: MainVM) {
+    val prefs = listOf("auto", "root", "shizuku")
+    val ok = vm.mode != Sh.Mode.NONE
+    val label = when (vm.mode) {
+        Sh.Mode.ROOT -> "AKTIF: ROOT"
+        Sh.Mode.SHIZUKU -> if (Sh.shizukuUid() == 0) "AKTIF: SHIZUKU (ROOT)" else "AKTIF: SHIZUKU (ADB)"
+        Sh.Mode.NONE -> "BELUM ADA AKSES"
+    }
+    Box(Modifier.padding(bottom = 14.dp)) {
+        GlassBox(Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                I(if (ok) Ic.Shield else Ic.Alert, if (ok) Success else Danger, 16.dp)
+                Text("MODE AKSES", color = IcePrimary, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+                Tag(label, if (ok) SuccessLight else DangerLight, if (ok) Success else Danger)
+            }
+            Spacer(Modifier.height(6.dp))
+            SlidingSelector(listOf("Auto", "Root", "Shizuku"), prefs.indexOf(vm.accessPref).coerceAtLeast(0)) { vm.setAccessPref(prefs[it]) }
+            if (!ok) {
+                val msg = when {
+                    !vm.shizukuRunning -> "Belum ada root dan Shizuku belum berjalan. Buka aplikasi Shizuku lalu Start (Wireless debugging atau root), kemudian tap Cek Ulang."
+                    !vm.shizukuGranted -> "Shizuku sudah berjalan, tapi izin untuk aplikasi ini belum diberikan."
+                    else -> "Mode yang dipilih belum tersedia. Ganti ke Auto atau cek ulang."
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(msg, color = TextMuted, fontSize = 10.5.sp, lineHeight = 14.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (vm.shizukuRunning && !vm.shizukuGranted) Btn("Beri Izin Shizuku", BtnKind.Success, Modifier.weight(1f)) { vm.requestShizuku() }
+                    Btn("Cek Ulang", BtnKind.Primary, Modifier.weight(1f)) { vm.recheckAccess() }
+                }
+            } else if (vm.mode == Sh.Mode.SHIZUKU && Sh.shizukuUid() != 0) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "Mode ADB: freeze, tuning, dan cleaner jalan. Drop cache RAM dan setprop persist tidak tersedia tanpa root.",
+                    color = TextMuted, fontSize = 10.5.sp, lineHeight = 14.sp, fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
     }
 }

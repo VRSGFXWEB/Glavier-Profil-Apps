@@ -43,6 +43,10 @@ class Store(ctx: Context) {
         get() = sp.getString("daily", "balance") ?: "balance"
         set(v) { sp.edit().putString("daily", v).apply() }
 
+    var accessPref: String
+        get() = sp.getString("access", "auto") ?: "auto"
+        set(v) { sp.edit().putString("access", v).apply() }
+
     var smooth: Boolean
         get() = sp.getBoolean("smooth", false)
         set(v) { sp.edit().putBoolean("smooth", v).apply() }

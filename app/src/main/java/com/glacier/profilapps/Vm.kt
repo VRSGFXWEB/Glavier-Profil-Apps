@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import rikka.shizuku.Shizuku
 import java.io.File
 
 class MainVM(app: Application) : AndroidViewModel(app) {
@@ -30,7 +31,10 @@ class MainVM(app: Application) : AndroidViewModel(app) {
 
     var apps by mutableStateOf<List<AppItem>>(emptyList()); private set
     var loading by mutableStateOf(false); private set
-    var rootOk by mutableStateOf<Boolean?>(null); private set
+    var mode by mutableStateOf(Sh.Mode.NONE); private set
+    var shizukuRunning by mutableStateOf(false); private set
+    var shizukuGranted by mutableStateOf(false); private set
+    var accessPref by mutableStateOf(store.accessPref); private set
     var dailyMode by mutableStateOf(store.dailyMode); private set
     var smooth by mutableStateOf(store.smooth); private set
     var whitelist by mutableStateOf(store.whitelist); private set
@@ -40,9 +44,31 @@ class MainVM(app: Application) : AndroidViewModel(app) {
     var toastMsg by mutableStateOf(""); private set
     var toastTick by mutableIntStateOf(0); private set
 
+    private val permL = Shizuku.OnRequestPermissionResultListener { _, _ -> viewModelScope.launch { refreshAccessNow() } }
+    private val binderL = Shizuku.OnBinderReceivedListener { viewModelScope.launch { refreshAccessNow() } }
+    private val deadL = Shizuku.OnBinderDeadListener { viewModelScope.launch { refreshAccessNow() } }
+
+    init {
+        try {
+            Shizuku.addRequestPermissionResultListener(permL)
+            Shizuku.addBinderReceivedListenerSticky(binderL)
+            Shizuku.addBinderDeadListener(deadL)
+        } catch (e: Throwable) { }
+    }
+
+    override fun onCleared() {
+        try {
+            Shizuku.removeRequestPermissionResultListener(permL)
+            Shizuku.removeBinderReceivedListener(binderL)
+            Shizuku.removeBinderDeadListener(deadL)
+        } catch (e: Throwable) { }
+        super.onCleared()
+    }
+
     init {
         viewModelScope.launch {
-            rootOk = Sh.hasRoot()
+            Sh.pkg = ctx.packageName
+            refreshAccessNow()
             smooth = try {
                 Settings.Global.getFloat(ctx.contentResolver, Settings.Global.WINDOW_ANIMATION_SCALE, 1f) in 0.4f..0.7f
             } catch (e: Exception) { store.smooth }
@@ -55,16 +81,35 @@ class MainVM(app: Application) : AndroidViewModel(app) {
     fun name(pkg: String) = apps.firstOrNull { it.pkg == pkg }?.name ?: pkg
     fun isFrozen(pkg: String) = apps.firstOrNull { it.pkg == pkg }?.frozen == true
 
-    private suspend fun sh(cmd: String): String? =
-        try { Sh.run(cmd) } catch (e: Exception) { toast("Gagal: akses root tidak tersedia"); null }
-
-    fun recheckRoot() = viewModelScope.launch {
-        rootOk = Sh.hasRoot()
-        toast(if (rootOk == true) "Akses root aktif" else "Root belum diberikan")
+    private suspend fun sh(cmd: String): String? {
+        if (Sh.mode == Sh.Mode.NONE) refreshAccessNow()
+        return try { Sh.run(cmd) } catch (e: Exception) { toast("Gagal: butuh akses root atau Shizuku"); null }
     }
 
+    suspend fun refreshAccessNow() {
+        shizukuRunning = Sh.shizukuRunning()
+        shizukuGranted = Sh.shizukuGranted()
+        mode = Sh.detect(accessPref)
+    }
+
+    fun recheckAccess() = viewModelScope.launch {
+        refreshAccessNow()
+        toast(when (mode) {
+            Sh.Mode.ROOT -> "Akses root aktif"
+            Sh.Mode.SHIZUKU -> "Akses Shizuku aktif"
+            Sh.Mode.NONE -> "Belum ada akses root/Shizuku"
+        })
+    }
+
+    fun setAccessPref(p: String) = viewModelScope.launch {
+        accessPref = p; store.accessPref = p
+        refreshAccessNow()
+    }
+
+    fun requestShizuku() = Sh.requestShizuku()
+
     fun refreshAll() = viewModelScope.launch {
-        rootOk = Sh.hasRoot(); loadAppsNow(); refreshRam(); toast("Data diperbarui")
+        refreshAccessNow(); loadAppsNow(); refreshRam(); toast("Data diperbarui")
     }
 
     // ---------- Packages ----------

@@ -107,7 +107,7 @@ fun HelpDialog(onDismiss: () -> Unit) {
         "Whitelist" to "Ikon bintang. Aplikasi yang di-whitelist tidak akan dimatikan oleh cleaner.",
         "Hentikan Latar Belakang" to "Menutup proses background aplikasi pihak ketiga dan memadatkan RAM.",
         "Deep Wipe Cache" to "Menghapus cache sistem, cache package, thumbnails, dan residu storage.",
-        "Catatan" to "Fitur freeze, tuning, dan cleaner membutuhkan akses root (KernelSU / Magisk).",
+        "Catatan" to "Fitur freeze, tuning, dan cleaner butuh akses root (KernelSU/Magisk) atau Shizuku. Pilih di kartu Mode Akses pada Home.",
     )
     GlacierDialog(onDismiss) {
         ModalHead(Ic.Book, "Buku Panduan Modul", IceDeep, "Panduan fungsi sistem dan tombol pada Glacier Freeze Apps:")
