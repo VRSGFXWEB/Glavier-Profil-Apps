@@ -1,5 +1,6 @@
 package com.glacier.profilapps
 
+import androidx.compose.ui.graphics.drawscope.drawOutline
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
