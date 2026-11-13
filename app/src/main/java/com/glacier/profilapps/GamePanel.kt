@@ -1,5 +1,7 @@
 package com.glacier.profilapps
 
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.draw.rotate
 import android.content.Context
 import android.media.AudioManager
 import android.net.Uri
