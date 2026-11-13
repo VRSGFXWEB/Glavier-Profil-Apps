@@ -47,7 +47,7 @@ fun PageBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.
         modifier.fillMaxSize().drawBehind {
             drawRect(
                 Brush.radialGradient(
-                    listOf(Color.White, Color(0xFFE8F4FC), Color(0xFFD8ECF8)),
+                    listOf(BgA, BgB, BgC),
                     center = Offset(size.width * 0.15f, size.height * 0.15f), radius = size.maxDimension * 1.2f
                 )
             )
@@ -69,7 +69,7 @@ fun SyncButton(label: String, onClick: () -> Unit) {
             scope.launch { rot.snapTo(0f); rot.animateTo(720f, tween(650, easing = LinearEasing)) }
             onClick()
         }.shadow(3.dp, CircleShape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(CircleShape)
-            .background(Color.White).border(1.5.dp, IceBorder, CircleShape).padding(horizontal = 12.dp, vertical = 8.dp),
+            .background(PanelBg).border(1.5.dp, IceBorder, CircleShape).padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         I(Ic.Sync, IceDeep, 16.dp, Modifier.graphicsLayer { rotationZ = rot.value })
@@ -82,8 +82,8 @@ fun HeaderCapsule(icon: ImageVector, title: String, sub: String, action: String?
     Row(
         Modifier.fillMaxWidth().padding(bottom = 14.dp)
             .shadow(6.dp, CircleShape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(CircleShape)
-            .background(Brush.linearGradient(listOf(Color(0xE6FFFFFF), Color(0xB3E0F2FE))))
-            .inset(CircleShape, 2.dp).border(1.5.dp, Color(0xE6FFFFFF), CircleShape)
+            .background(Brush.linearGradient(listOf(HeadA, HeadB)))
+            .inset(CircleShape, 2.dp).border(1.5.dp, WhiteRim, CircleShape)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -104,7 +104,25 @@ fun HeaderCapsule(icon: ImageVector, title: String, sub: String, action: String?
             )
             Text(sub.uppercase(), color = IcePrimary, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.5.sp, maxLines = 1)
         }
-        if (action != null) SyncButton(action, onAction)
+        if (action != null) { SyncButton(action, onAction); Spacer(Modifier.width(8.dp)) }
+        ThemeToggle()
+    }
+}
+
+@Composable
+fun ThemeToggle() {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    Box(
+        Modifier.pressable {
+            ThemeState.dark = !ThemeState.dark
+            Store(ctx).dark = ThemeState.dark
+        }.shadow(3.dp, CircleShape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(CircleShape)
+            .background(PanelBg).border(1.5.dp, IceBorder, CircleShape).size(34.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        androidx.compose.animation.Crossfade(ThemeState.dark, animationSpec = tween(300), label = "themeic") { d ->
+            I(if (d) Ic.Sun else Ic.Moon, IceDeep, 16.dp)
+        }
     }
 }
 
@@ -114,7 +132,7 @@ fun PitBox(modifier: Modifier = Modifier, content: @Composable ColumnScope.() ->
     val shape = RoundedCornerShape(26.dp)
     Column(
         modifier.fillMaxWidth().clip(shape)
-            .background(Brush.linearGradient(listOf(Color(0xBFE0F2FE), Color(0x80F0F9FF), Color(0xCCE6F6FF))))
+            .background(Brush.linearGradient(listOf(PitA, PitB, PitC)))
             .inset(shape, 5.dp).border(2.dp, WhiteRim, shape).padding(horizontal = 10.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp), content = content
     )
@@ -126,7 +144,7 @@ fun GlassBox(modifier: Modifier = Modifier, content: @Composable ColumnScope.() 
     val shape = RoundedCornerShape(22.dp)
     Column(
         modifier.clip(shape)
-            .background(Brush.linearGradient(listOf(Color(0xE0FFFFFF), Color(0xA6E0F2FE))))
+            .background(Brush.linearGradient(listOf(GlassA, GlassB)))
             .inset(shape, 4.dp).border(1.5.dp, WhiteRim, shape).padding(horizontal = 12.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp), content = content
     )
@@ -138,7 +156,7 @@ fun ActionCard(modifier: Modifier = Modifier, onClick: () -> Unit, content: @Com
     val shape = RoundedCornerShape(22.dp)
     Column(
         modifier.pressable(onClick).shadow(4.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape)
-            .background(Brush.linearGradient(listOf(Color(0xEBFFFFFF), Color(0xBFF0F9FF))))
+            .background(Brush.linearGradient(listOf(ActA, ActB)))
             .inset(shape, 2.5.dp).border(1.5.dp, IceBorder, shape).padding(horizontal = 14.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp), content = content
     )
@@ -150,7 +168,7 @@ fun PillButton(onClick: () -> Unit, tint: Color, border: Color, borderW: Dp = 1.
     Row(
         Modifier.fillMaxWidth().pressable(onClick)
             .shadow(3.dp, CircleShape, ambientColor = tint, spotColor = tint).clip(CircleShape)
-            .background(Brush.linearGradient(listOf(Color(0xF2FFFFFF), tint.copy(alpha = 0.12f).compositeOver(Color(0xF2FFFFFF)))))
+            .background(Brush.linearGradient(listOf(ActA, tint.copy(alpha = 0.12f).compositeOver(ActA))))
             .inset(CircleShape, 2.dp).border(borderW, border, CircleShape).padding(horizontal = 18.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically, content = content
     )
@@ -160,8 +178,8 @@ fun PillButton(onClick: () -> Unit, tint: Color, border: Color, borderW: Dp = 1.
 fun TableHead(left: String, right: @Composable () -> Unit = {}) {
     Row(
         Modifier.fillMaxWidth().shadow(3.dp, CircleShape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(CircleShape)
-            .background(Brush.linearGradient(listOf(IceBorder, IceRim, IceGlow)))
-            .border(1.5.dp, Color.White, CircleShape).padding(horizontal = 16.dp, vertical = 9.dp),
+            .background(Brush.linearGradient(listOf(BandA, BandB, BandC)))
+            .border(1.5.dp, WhiteRim, CircleShape).padding(horizontal = 16.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(left.uppercase(), color = TextMain, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.6.sp, maxLines = 1, modifier = Modifier.weight(1f, false))
@@ -173,7 +191,7 @@ fun TableHead(left: String, right: @Composable () -> Unit = {}) {
 fun CapsuleRow(modifier: Modifier = Modifier, height: Dp = 68.dp, content: @Composable RowScope.() -> Unit) {
     Row(
         modifier.fillMaxWidth().height(height).clip(CircleShape)
-            .background(Brush.verticalGradient(listOf(Color(0xF2FFFFFF), Color(0xD9F4FAFF))))
+            .background(Brush.verticalGradient(listOf(RowA, RowB)))
             .inset(CircleShape, 2.dp).border(1.5.dp, IceBorder, CircleShape).padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically, content = content
     )

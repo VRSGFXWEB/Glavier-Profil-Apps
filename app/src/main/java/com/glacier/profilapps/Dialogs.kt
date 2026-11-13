@@ -39,7 +39,7 @@ fun GlacierDialog(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> 
         Column(
             Modifier.padding(20.dp).fillMaxWidth().heightIn(max = maxH)
                 .shadow(20.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape)
-                .background(Brush.linearGradient(listOf(Color(0xFAFFFFFF), Color(0xF2F0F9FF))))
+                .background(Brush.linearGradient(listOf(DlgA, DlgB)))
                 .inset(shape, 5.dp).border(2.dp, IcePrimary, shape)
                 .verticalScroll(rememberScrollState()).padding(20.dp),
             content = content
@@ -60,9 +60,9 @@ fun ModalHead(icon: ImageVector, title: String, tint: Color = IceDeep, desc: Str
 @Composable
 fun CancelBtn(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
-        modifier.pressable(onClick).clip(CircleShape).background(Color(0xFFE2E8F0)).padding(vertical = 10.dp, horizontal = 16.dp),
+        modifier.pressable(onClick).clip(CircleShape).background(CancelBg).padding(vertical = 10.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
-    ) { Text(text, color = Color(0xFF334155), fontSize = 12.sp, fontWeight = FontWeight.ExtraBold) }
+    ) { Text(text, color = CancelFg, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold) }
 }
 
 @Composable
@@ -70,7 +70,7 @@ private fun CleanPill(onClick: () -> Unit, content: @Composable ColumnScope.() -
     val shape = RoundedCornerShape(20.dp)
     Column(
         Modifier.fillMaxWidth().pressable(onClick).shadow(3.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape)
-            .background(Brush.linearGradient(listOf(Color.White, IceSurface))).border(1.5.dp, IceBorder, shape).padding(12.dp),
+            .background(Brush.linearGradient(listOf(PanelBg, IceSurface))).border(1.5.dp, IceBorder, shape).padding(12.dp),
         content = content
     )
 }
@@ -187,7 +187,7 @@ private fun GameCard(g: GameCfg, expanded: Boolean, vm: MainVM, onToggle: () -> 
         thumbColor = IcePrimary, activeTrackColor = IcePrimary, inactiveTrackColor = IceLight
     )
     Column(
-        Modifier.fillMaxWidth().clip(shape).background(Brush.verticalGradient(listOf(Color.White, Color(0xFFF4FAFF))))
+        Modifier.fillMaxWidth().clip(shape).background(Brush.verticalGradient(listOf(PanelBg, RowB)))
             .inset(shape, 2.dp).border(1.5.dp, IceBorder, shape).animateContentSize().padding(10.dp)
     ) {
         Row(Modifier.fillMaxWidth().clickable { onToggle() }, verticalAlignment = Alignment.CenterVertically) {

@@ -1,3 +1,6 @@
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 package com.glacier.profilapps
 
 import android.os.Build
@@ -41,6 +44,7 @@ fun HomeScreen(vm: MainVM) {
         HeaderCapsule(Ic.Home, "Glacier Home", "Core Ecosystem", "Refresh") { vm.refreshAll() }
 
         AccessCard(vm)
+        GamePanelCard(vm)
 
         Appear(0) {
             val shape = RoundedCornerShape(26.dp)
@@ -199,6 +203,42 @@ private fun AccessCard(vm: MainVM) {
                     color = TextMuted, fontSize = 10.5.sp, lineHeight = 14.sp, fontWeight = FontWeight.SemiBold
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun GamePanelCard(vm: MainVM) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val overlayL = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (Settings.canDrawOverlays(ctx)) OverlayService.start(ctx, null)
+    }
+    Box(Modifier.padding(bottom = 14.dp)) {
+        PillButton(
+            {
+                if (Settings.canDrawOverlays(ctx)) {
+                    if (OverlayState.running) OverlayService.stop(ctx) else OverlayService.start(ctx, null)
+                } else {
+                    overlayL.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${ctx.packageName}")))
+                }
+            },
+            IcePrimary, IcePrimary
+        ) {
+            Box(
+                Modifier.size(32.dp).clip(CircleShape).background(Brush.linearGradient(listOf(Color(0xFF0EA5E9), IcePrimary))),
+                contentAlignment = Alignment.Center
+            ) { I(Ic.Gamepad, Color.White, 16.dp) }
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Game Panel", color = TextMain, fontSize = 12.8.sp, fontWeight = FontWeight.ExtraBold)
+                Text(
+                    if (OverlayState.running) "Aktif - bubble mengambang di layar" else "Bubble mengambang: boost, record, SS, brightness",
+                    color = TextMuted, fontSize = 10.sp, fontWeight = FontWeight.SemiBold
+                )
+            }
+            I(Ic.Chevron, IceDeep, 16.dp)
         }
     }
 }

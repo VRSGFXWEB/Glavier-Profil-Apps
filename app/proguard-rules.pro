@@ -4,3 +4,5 @@
 -keep class com.glacier.profilapps.IUserService** { *; }
 -keep class rikka.shizuku.** { *; }
 -keep class moe.shizuku.** { *; }
+-keep class com.glacier.profilapps.OverlayService { *; }
+-keep class com.glacier.profilapps.OverlayOwner { *; }

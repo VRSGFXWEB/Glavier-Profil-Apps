@@ -46,6 +46,9 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.savedstate:savedstate:1.2.1")
+    implementation("androidx.lifecycle:lifecycle-runtime:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.6")
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
 }

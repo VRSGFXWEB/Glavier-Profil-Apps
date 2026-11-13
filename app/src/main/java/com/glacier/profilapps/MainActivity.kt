@@ -41,17 +41,29 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(AColor.TRANSPARENT, AColor.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.light(AColor.TRANSPARENT, AColor.TRANSPARENT)
-        )
+        val dark = Store(this).dark
+        ThemeState.dark = dark
+        ThemeState.t = if (dark) 1f else 0f
+        applyBars(dark)
         setContent { GlacierTheme { Root() } }
     }
+}
+
+private fun ComponentActivity.applyBars(dark: Boolean) {
+    val style = if (dark) SystemBarStyle.dark(AColor.TRANSPARENT) else SystemBarStyle.light(AColor.TRANSPARENT, AColor.TRANSPARENT)
+    enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
 }
 
 @Composable
 fun Root() {
     var splash by rememberSaveable { mutableStateOf(true) }
+    val act = androidx.compose.ui.platform.LocalContext.current as? ComponentActivity
+    val dark = ThemeState.dark
+    LaunchedEffect(dark) {
+        act?.applyBars(dark)
+        val a = Animatable(ThemeState.t)
+        a.animateTo(if (dark) 1f else 0f, tween(450)) { ThemeState.t = value }
+    }
     Box(Modifier.fillMaxSize().background(BgBase)) {
         Crossfade(splash, animationSpec = tween(700), label = "root") { s ->
             if (s) SplashScreen { splash = false } else MainScreen()
@@ -87,7 +99,7 @@ fun SplashScreen(onDone: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                Modifier.fillMaxWidth().height(14.dp).clip(CircleShape).background(Color.White)
+                Modifier.fillMaxWidth().height(14.dp).clip(CircleShape).background(PanelBg)
                     .inset(CircleShape, 2.dp).border(1.5.dp, IceBorder, CircleShape)
             ) {
                 Box(
@@ -140,7 +152,7 @@ fun BottomNav(tab: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) 
     BoxWithConstraints(
         modifier.fillMaxWidth(0.94f)
             .shadow(14.dp, CircleShape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(CircleShape)
-            .background(Brush.linearGradient(listOf(Color(0xE6F0F9FF), Color(0xCCE0F2FE))))
+            .background(Brush.linearGradient(listOf(NavA, NavB)))
             .inset(CircleShape, 5.dp).border(1.5.dp, IcePrimary, CircleShape).padding(5.dp)
     ) {
         val unit = maxWidth / (tabs.size - 1 + ACTIVE_W)

@@ -37,14 +37,14 @@ fun Chip(text: String, badge: Int, selected: Boolean, onClick: () -> Unit) {
     val on by animateFloatAsState(if (selected) 1f else 0f, tween(250), label = "co")
     Row(
         Modifier.pressable(onClick).clip(CircleShape)
-            .background(Color(0xD9FFFFFF))
+            .background(PanelBg.copy(alpha = 0.85f))
             .background(Brush.linearGradient(listOf(IcePrimary.copy(alpha = on), IceDeep.copy(alpha = on))))
             .border(1.5.dp, if (selected) IceDeep else IceBorder, CircleShape)
             .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(text, color = fg, fontSize = 11.5.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
-        Box(Modifier.clip(CircleShape).background(if (selected) Color(0x40FFFFFF) else Color(0x0F000000)).padding(horizontal = 6.dp, vertical = 1.dp)) {
+        Box(Modifier.clip(CircleShape).background(if (selected) Color(0x40FFFFFF) else ChipBadge).padding(horizontal = 6.dp, vertical = 1.dp)) {
             Text("$badge", color = fg, fontSize = 10.sp)
         }
     }
@@ -54,7 +54,7 @@ fun Chip(text: String, badge: Int, selected: Boolean, onClick: () -> Unit) {
 fun MetricPill(value: String, label: String, color: Color, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(20.dp)
     Column(
-        modifier.clip(shape).background(Brush.linearGradient(listOf(Color(0xD9FFFFFF), Color(0xA6E0F2FE))))
+        modifier.clip(shape).background(Brush.linearGradient(listOf(GlassA, GlassB)))
             .inset(shape, 2.dp).border(1.5.dp, WhiteRim, shape).padding(vertical = 12.dp, horizontal = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -69,7 +69,7 @@ fun SearchField(value: String, onChange: (String) -> Unit, placeholder: String, 
     val bc by animateColorAsState(if (focused) IcePrimary else IceBorder, tween(250), label = "sf")
     Row(
         modifier.fillMaxWidth().clip(CircleShape)
-            .background(Brush.linearGradient(listOf(IceSurface, Color(0xFFE6F4FE))))
+            .background(Brush.linearGradient(listOf(IceSurface, Panel2)))
             .inset(CircleShape, 2.dp).border(1.5.dp, bc, CircleShape).padding(horizontal = 14.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -111,7 +111,7 @@ fun AppIcon(pkg: String, size: Dp = 42.dp) {
     val b = bmp
     Box(
         Modifier.size(size).shadow(2.dp, RoundedCornerShape(12.dp), ambientColor = ShadowIce, spotColor = ShadowIce)
-            .clip(RoundedCornerShape(12.dp)).background(Color.White)
+            .clip(RoundedCornerShape(12.dp)).background(PanelBg)
             .border(1.5.dp, IceBorder, RoundedCornerShape(12.dp)).padding(2.dp)
     ) { if (b != null) Image(b, null, Modifier.fillMaxSize()) }
 }
@@ -121,7 +121,7 @@ fun IceSwitch(checked: Boolean, onChange: (Boolean) -> Unit) {
     val on by animateFloatAsState(if (checked) 1f else 0f, tween(300, easing = IceBezier), label = "sw")
     val x by animateDpAsState(if (checked) 27.dp else 3.dp, tween(300, easing = IceBezier), label = "swx")
     Box(
-        Modifier.size(52.dp, 28.dp).clip(CircleShape).background(Color(0xFFCBD5E1))
+        Modifier.size(52.dp, 28.dp).clip(CircleShape).background(SwitchOff)
             .background(Brush.horizontalGradient(listOf(IceGlow.copy(alpha = on), IcePrimary.copy(alpha = on))))
             .clickable { onChange(!checked) }
     ) {
@@ -170,7 +170,7 @@ fun IslandToast(vm: MainVM) {
         ) {
             Row(
                 Modifier.shadow(14.dp, CircleShape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(CircleShape)
-                    .background(Color(0xF2FFFFFF)).border(1.5.dp, Color.White, CircleShape)
+                    .background(ToastBg).border(1.5.dp, WhiteRim, CircleShape)
                     .padding(horizontal = 20.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {

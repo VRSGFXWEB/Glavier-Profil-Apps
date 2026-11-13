@@ -34,7 +34,7 @@ fun SaranScreen(vm: MainVM) {
                         Text(vm.name(b.pkg), color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(b.pkg, color = IceDeep, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Tag(b.desc.take(18), androidx.compose.ui.graphics.Color(0xFFFEF2F2), androidx.compose.ui.graphics.Color(0xFFDC2626), androidx.compose.ui.graphics.Color(0xFFFCA5A5))
+                            Tag(b.desc.take(18), DangerLight, Danger, Danger.copy(alpha = 0.5f))
                             if (frozen) Tag("BEKU", DangerLight, Danger) else Tag("AKTIF", SuccessLight, Success)
                         }
                     }

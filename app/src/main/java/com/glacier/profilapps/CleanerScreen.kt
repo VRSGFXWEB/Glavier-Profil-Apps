@@ -42,7 +42,7 @@ fun CleanerScreen(vm: MainVM, active: Boolean) {
                         Text("${r.pct}%", color = IceDeep, fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
                     }
                     Box(
-                        Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(14.dp).clip(CircleShape).background(Color.White)
+                        Modifier.padding(horizontal = 6.dp).fillMaxWidth().height(14.dp).clip(CircleShape).background(PanelBg)
                             .inset(CircleShape, 2.dp).border(1.5.dp, IceBorder, CircleShape)
                     ) {
                         Box(
@@ -68,7 +68,7 @@ fun CleanerScreen(vm: MainVM, active: Boolean) {
             val shape = RoundedCornerShape(20.dp)
             Row(
                 Modifier.fillMaxWidth().shadow(3.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape)
-                    .background(Brush.linearGradient(listOf(Color.White, IceSurface))).border(1.5.dp, IceBorder, shape)
+                    .background(Brush.linearGradient(listOf(PanelBg, IceSurface))).border(1.5.dp, IceBorder, shape)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -87,7 +87,7 @@ fun CleanerScreen(vm: MainVM, active: Boolean) {
 private fun StatPill(value: String, label: String, color: Color, modifier: Modifier) {
     val shape = RoundedCornerShape(18.dp)
     Column(
-        modifier.shadow(2.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape).background(Color.White)
+        modifier.shadow(2.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape).background(PanelBg)
             .border(1.5.dp, IceBorder, shape).padding(vertical = 8.dp, horizontal = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -101,7 +101,7 @@ private fun CleanBtn(icon: ImageVector, tint: Color, text: String, modifier: Mod
     val shape = RoundedCornerShape(20.dp)
     Column(
         modifier.pressable(onClick).shadow(4.dp, shape, ambientColor = ShadowIce, spotColor = ShadowIce).clip(shape)
-            .background(Brush.linearGradient(listOf(Color.White, IceSurface))).border(1.5.dp, IceBorder, shape)
+            .background(Brush.linearGradient(listOf(PanelBg, IceSurface))).border(1.5.dp, IceBorder, shape)
             .padding(horizontal = 10.dp, vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {

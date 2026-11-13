@@ -117,7 +117,7 @@ private fun AppRow(app: AppItem, wl: Boolean, vm: MainVM, askSystem: () -> Unit)
         Spacer(Modifier.width(8.dp))
         Box(
             Modifier.size(32.dp).pressable { vm.toggleWhitelist(app.pkg) }.clip(CircleShape)
-                .background(if (wl) WarningLight else Color.White)
+                .background(if (wl) WarningLight else PanelBg)
                 .border(1.5.dp, if (wl) Color(0xFFF59E0B) else IceBorder, CircleShape),
             contentAlignment = Alignment.Center
         ) { I(Ic.Star, if (wl) Warning else TextMuted, 16.dp) }
