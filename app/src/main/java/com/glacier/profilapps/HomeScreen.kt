@@ -1,8 +1,8 @@
+package com.glacier.profilapps
+
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-package com.glacier.profilapps
-
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
